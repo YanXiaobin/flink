@@ -445,7 +445,7 @@ public class BucketingSink<T>
 		bucketState.writer.write(value);
 		bucketState.lastWrittenToTime = currentProcessingTime;
 	}
-	
+
 	/**
 	 * Returns {@code true} if the current {@code part-file} should be closed and a new should be created.
 	 * This happens if:
