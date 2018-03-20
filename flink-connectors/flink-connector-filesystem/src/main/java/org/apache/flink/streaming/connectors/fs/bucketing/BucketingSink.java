@@ -423,7 +423,12 @@ public class BucketingSink<T>
 
 	@Override
 	public void invoke(T value) throws Exception {
-		Path bucketPath = bucketer.getBucketPath(clock, new Path(basePath), value);
+		throw new RuntimeException("deprecated invoke");
+	}
+
+	@Override
+	public void invoke(T value, Context context) throws Exception {
+		Path bucketPath = bucketer.getBucketPath(clock, new Path(basePath), context, value);
 
 		long currentProcessingTime = processingTimeService.getCurrentProcessingTime();
 
@@ -440,7 +445,7 @@ public class BucketingSink<T>
 		bucketState.writer.write(value);
 		bucketState.lastWrittenToTime = currentProcessingTime;
 	}
-
+	
 	/**
 	 * Returns {@code true} if the current {@code part-file} should be closed and a new should be created.
 	 * This happens if:

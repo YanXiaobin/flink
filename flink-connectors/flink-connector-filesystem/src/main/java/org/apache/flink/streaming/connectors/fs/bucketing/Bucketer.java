@@ -18,6 +18,7 @@
 
 package org.apache.flink.streaming.connectors.fs.bucketing;
 
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.fs.Clock;
 
 import org.apache.hadoop.fs.Path;
@@ -39,11 +40,12 @@ public interface Bucketer<T> extends Serializable {
 	 * Returns the {@link Path} of a bucket file.
 	 *
 	 * @param basePath The base path containing all the buckets.
+	 * @param context
 	 * @param element The current element being processed.
 	 *
 	 * @return The complete {@code Path} of the bucket which the provided element should fall in. This
 	 * should include the {@code basePath} and also the {@code subtaskIndex} to avoid clashes with
 	 * parallel sinks.
 	 */
-	Path getBucketPath(Clock clock, Path basePath, T element);
+	Path getBucketPath(Clock clock, Path basePath, SinkFunction.Context context, T element);
 }

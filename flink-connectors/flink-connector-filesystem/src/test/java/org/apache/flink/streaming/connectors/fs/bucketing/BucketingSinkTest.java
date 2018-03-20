@@ -22,6 +22,7 @@ import org.apache.flink.api.common.ExecutionConfig;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.operators.StreamSink;
 import org.apache.flink.streaming.connectors.fs.AvroKeyValueSinkWriter;
 import org.apache.flink.streaming.connectors.fs.Clock;
@@ -91,7 +92,7 @@ public class BucketingSinkTest {
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				public Path getBucketPath(Clock clock, Path basePath, String element) {
+				public Path getBucketPath(Clock clock, Path basePath, SinkFunction.Context context, String element) {
 					return new Path(basePath, element);
 				}
 			})
@@ -115,7 +116,7 @@ public class BucketingSinkTest {
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				public Path getBucketPath(Clock clock, Path basePath, String element) {
+				public Path getBucketPath(Clock clock, Path basePath, SinkFunction.Context context, String element) {
 					return new Path(basePath, element);
 				}
 			})

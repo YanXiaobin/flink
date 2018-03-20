@@ -18,6 +18,7 @@
 
 package org.apache.flink.streaming.connectors.fs.bucketing;
 
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.fs.Clock;
 
 import org.apache.hadoop.fs.Path;
@@ -30,7 +31,7 @@ public class BasePathBucketer<T> implements Bucketer<T> {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public Path getBucketPath(Clock clock, Path basePath, T element) {
+	public Path getBucketPath(Clock clock, Path basePath, SinkFunction.Context context, T element) {
 		return basePath;
 	}
 

@@ -58,16 +58,16 @@ public class Kafka09Fetcher<T> extends AbstractFetcher<T, TopicPartition> {
 	// ------------------------------------------------------------------------
 
 	/** The schema to convert between Kafka's byte messages, and Flink's objects. */
-	private final KeyedDeserializationSchema<T> deserializer;
+	protected final KeyedDeserializationSchema<T> deserializer;
 
 	/** The handover of data and exceptions between the consumer thread and the task thread. */
-	private final Handover handover;
+	protected final Handover handover;
 
 	/** The thread that runs the actual KafkaConsumer and hand the record batches to this fetcher. */
-	private final KafkaConsumerThread consumerThread;
+	protected final KafkaConsumerThread consumerThread;
 
 	/** Flag to mark the main work loop as alive. */
-	private volatile boolean running = true;
+	protected volatile boolean running = true;
 
 	// ------------------------------------------------------------------------
 

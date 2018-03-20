@@ -18,6 +18,7 @@
 
 package org.apache.flink.streaming.connectors.fs.bucketing;
 
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.connectors.fs.Clock;
 
 import org.apache.hadoop.fs.Path;
@@ -90,7 +91,7 @@ public class DateTimeBucketer<T> implements Bucketer<T> {
 	}
 
 	@Override
-	public Path getBucketPath(Clock clock, Path basePath, T element) {
+	public Path getBucketPath(Clock clock, Path basePath, SinkFunction.Context context, T element) {
 		String newDateTimeString = dateFormatter.format(new Date(clock.currentTimeMillis()));
 		return new Path(basePath + "/" + newDateTimeString);
 	}
