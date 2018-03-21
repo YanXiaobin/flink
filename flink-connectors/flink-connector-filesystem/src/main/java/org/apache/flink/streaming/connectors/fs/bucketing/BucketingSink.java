@@ -42,9 +42,7 @@ import org.apache.flink.streaming.runtime.tasks.ProcessingTimeService;
 import org.apache.flink.util.Preconditions;
 
 import org.apache.commons.lang3.time.StopWatch;
-import org.apache.hadoop.fs.FSDataOutputStream;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.*;
 import org.apache.hadoop.hdfs.DistributedFileSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -635,7 +633,9 @@ public class BucketingSink<T>
 
 			Iterator<Map.Entry<String, BucketState<T>>> bucketStatesIt = state.bucketStates.entrySet().iterator();
 			while (bucketStatesIt.hasNext()) {
-				BucketState<T> bucketState = bucketStatesIt.next().getValue();
+				Map.Entry<String, BucketState<T>> next = bucketStatesIt.next();
+				BucketState<T> bucketState = next.getValue();
+				String bucket = next.getKey();
 				synchronized (bucketState.pendingFilesPerCheckpoint) {
 
 					Iterator<Map.Entry<Long, List<String>>> pendingCheckpointsIt =
@@ -663,10 +663,33 @@ public class BucketingSink<T>
 							pendingCheckpointsIt.remove();
 						}
 					}
-
 					if (!bucketState.isWriterOpen &&
 						bucketState.pendingFiles.isEmpty() &&
 						bucketState.pendingFilesPerCheckpoint.isEmpty()) {
+
+						Path tmp = new Path(bucket + "/tmp");
+						if (!fs.exists(tmp)) {
+							try {
+								if (fs.mkdirs(tmp)) {
+									LOG.debug("Created bucket tmp directory: {}", tmp.toString());
+								}
+							} catch (IOException e) {
+								throw new RuntimeException("Could not create  bucket tmp directory.", e);
+							}
+						}
+						Path marker = new Path(bucket + "/tmp/_" + getRuntimeContext().getIndexOfThisSubtask());
+						if (!fs.exists(marker)) {
+							fs.create(marker).close();
+						}
+
+						FileStatus[] fileStatuses = fs.listStatus(new Path(bucket + "/tmp"));
+						int  parallelism = getRuntimeContext().getNumberOfParallelSubtasks();
+						if (fileStatuses.length == parallelism) {
+							Path success = new Path(bucket + "/_SUCCESS");
+							if (!fs.exists(success)) {
+								fs.create(success).close();
+							}
+						}
 
 						// We've dealt with all the pending files and the writer for this bucket is not currently open.
 						// Therefore this bucket is currently inactive and we can remove it from our state.
