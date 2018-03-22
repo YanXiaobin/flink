@@ -674,7 +674,7 @@ public class BucketingSink<T>
 									LOG.debug("Created bucket tmp directory: {}", tmp.toString());
 								}
 							} catch (IOException e) {
-								throw new RuntimeException("Could not create  bucket tmp directory.", e);
+								throw new RuntimeException("Could not create bucket tmp directory.", e);
 							}
 						}
 						Path marker = new Path(bucket + "/tmp/_" + getRuntimeContext().getIndexOfThisSubtask());
@@ -688,6 +688,15 @@ public class BucketingSink<T>
 							Path success = new Path(bucket + "/_SUCCESS");
 							if (!fs.exists(success)) {
 								fs.create(success).close();
+							}
+							if (fs.exists(tmp)) {
+								try {
+									if (fs.delete(tmp,true)) {
+										LOG.debug("Deleted bucket tmp directory: {}", tmp.toString());
+									}
+								} catch (IOException e) {
+									throw new RuntimeException("Could not delete bucket tmp directory.", e);
+								}
 							}
 						}
 
